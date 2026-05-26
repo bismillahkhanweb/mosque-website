@@ -1,210 +1,196 @@
-// --- DATA: Courses ---
-const courses = [
-  {
-    id: 1,
-    title: "HTML & CSS Mastery",
-    level: "beginner",
-    duration: "4 Weeks",
-    fee: "5,000",
-    img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
-  },
-  {
-    id: 2,
-    title: "JavaScript Fundamentals",
-    level: "beginner",
-    duration: "6 Weeks",
-    fee: "8,000",
-    img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
-  },
-  {
-    id: 3,
-    title: "React.js Development",
-    level: "intermediate",
-    duration: "8 Weeks",
-    fee: "15,000",
-    img: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800&q=80",
-  },
-  {
-    id: 4,
-    title: "Python for Data Science",
-    level: "intermediate",
-    duration: "10 Weeks",
-    fee: "18,000",
-    img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
-  },
-  {
-    id: 5,
-    title: "Advanced Machine Learning",
-    level: "advanced",
-    duration: "12 Weeks",
-    fee: "25,000",
-    img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
-  },
-  {
-    id: 6,
-    title: "Cloud Architecture (AWS)",
-    level: "advanced",
-    duration: "10 Weeks",
-    fee: "30,000",
-    img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
-  },
-];
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- 1. Navbar Sticky & Mobile Toggle ---
+        const navbar = document.getElementById("navbar");
+        const hamburger = document.getElementById("hamburger");
+        const navLinks = document.getElementById("navLinks");
+        const navItems = document.querySelectorAll(".nav-links a");
 
-// --- DOM ELEMENTS ---
-const courseGrid = document.getElementById("course-grid");
-const filterBtns = document.querySelectorAll(".filter-btn");
-const navbar = document.getElementById("navbar");
-const hamburger = document.getElementById("hamburger");
-const navLinks = document.getElementById("nav-links");
-const accordionHeaders = document.querySelectorAll(".accordion-header");
+        // Sticky Navbar
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 50) {
+            navbar.classList.add("sticky");
+          } else {
+            navbar.classList.remove("sticky");
+          }
+        });
 
-// --- INITIALIZATION ---
+        // Mobile Menu
+        hamburger.addEventListener("click", () => {
+          navLinks.classList.toggle("active");
+        });
 
-// 1. Render Courses
-function renderCourses(filter = "all") {
-  courseGrid.innerHTML = "";
+        // Close mobile menu when a link is clicked
+        navItems.forEach((item) => {
+          item.addEventListener("click", () => {
+            navLinks.classList.remove("active");
+          });
+        });
 
-  courses.forEach((course) => {
-    if (filter === "all" || course.level === filter) {
-      const card = document.createElement("div");
-      card.className = "course-card";
+        // --- 2. Live Clock & Prayer Logic ---
+        function updateClockAndPrayer() {
+          const now = new Date();
+          const hours = String(now.getHours()).padStart(2, "0");
+          const minutes = String(now.getMinutes()).padStart(2, "0");
+          const seconds = String(now.getSeconds()).padStart(2, "0");
 
-      card.innerHTML = `
-                        <div class="card-thumb">
-                            <img src="${course.img}" alt="${course.title}">
-                            <div class="level-badge">${course.level}</div>
-                        </div>
-                        <div class="card-content">
-                            <h3>${course.title}</h3>
-                            <div class="course-meta">
-                                <span>&#9201; ${course.duration}</span>
-                                <span>&#128214; Online</span>
-                            </div>
-                            <span class="course-price">PKR ${course.fee}</span>
-                            <button class="enroll-btn" onclick="alert('Enrollment feature clicked for: ${course.title}')">Enroll Now</button>
-                        </div>
-                    `;
-      courseGrid.appendChild(card);
+          // Update Digital Clock
+          document.getElementById("liveClock").textContent =
+            `${hours}:${minutes}:${seconds}`;
 
-      // Small delay to allow display:block to apply before opacity transition
-      setTimeout(() => {
-        card.classList.add("visible");
-      }, 50);
-    }
-  });
-}
+          // Define Prayer Times (24h format string for comparison)
+          // In a real app, these would come from an API based on location
+          const prayers = [
+            { id: "card-fajr", name: "Fajr", time: "05:15" },
+            { id: "card-dhuhr", name: "Dhuhr", time: "12:30" },
+            { id: "card-asr", name: "Asr", time: "16:15" },
+            { id: "card-maghrib", name: "Maghrib", time: "18:45" },
+            { id: "card-isha", name: "Isha", time: "20:00" },
+          ];
 
-renderCourses();
+          const currentTimeStr = `${hours}:${minutes}`;
+          let nextPrayer = null;
+          let minDiff = Infinity;
 
-// 2. Filter Logic
-filterBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    filterBtns.forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    renderCourses(btn.dataset.filter);
-  });
-});
+          // Reset active classes
+          document
+            .querySelectorAll(".prayer-card")
+            .forEach((c) => c.classList.remove("active-prayer"));
 
-// 3. Sticky Navbar & Mobile Menu
-window.addEventListener("scroll", () => {
-  if (window.scrollY > 50) {
-    navbar.classList.add("scrolled");
-  } else {
-    navbar.classList.remove("scrolled");
-  }
-});
+          // Find next prayer
+          prayers.forEach((prayer) => {
+            // Compare times simply for this demo
+            const pTime = prayer.time;
 
-hamburger.addEventListener("click", () => {
-  navLinks.classList.toggle("active");
-});
+            // Highlight current/active prayer roughly
+            if (currentTimeStr >= pTime) {
+              // Logic to find the most recent passed prayer could go here
+              // But we primarily care about NEXT
+            }
 
-document.querySelectorAll(".nav-links a").forEach((link) => {
-  link.addEventListener("click", () => {
-    navLinks.classList.remove("active");
-  });
-});
+            // Calculate difference
+            const pHours = parseInt(pTime.split(":")[0]);
+            const pMins = parseInt(pTime.split(":")[1]);
+            const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+            const prayerTotalMins = pHours * 60 + pMins;
 
-// 4. Animated Counters (Intersection Observer)
-const statsSection = document.getElementById("stats");
-const counters = document.querySelectorAll(".stat-item h3");
-let started = false;
+            let diff = prayerTotalMins - currentTotalMins;
 
-const startCounters = () => {
-  counters.forEach((counter) => {
-    const target = +counter.getAttribute("data-target");
-    const duration = 2000; // 2 seconds
-    const increment = target / (duration / 16);
+            // Handle prayer tomorrow (e.g., if it's 22:00, next prayer is Fajr at 05:15)
+            if (diff < 0) {
+              diff += 24 * 60;
+            }
 
-    let current = 0;
-    const updateCount = () => {
-      current += increment;
-      if (current < target) {
-        counter.innerText = Math.ceil(current).toLocaleString();
-        requestAnimationFrame(updateCount);
-      } else {
-        counter.innerText = target.toLocaleString() + "+";
-      }
-    };
-    updateCount();
-  });
-};
+            if (diff < minDiff) {
+              minDiff = diff;
+              nextPrayer = prayer;
+            }
+          });
 
-const statsObserver = new IntersectionObserver(
-  (entries) => {
-    if (entries[0].isIntersecting && !started) {
-      startCounters();
-      started = true;
-    }
-  },
-  { threshold: 0.5 },
-);
+          if (nextPrayer) {
+            document.getElementById("nextPrayerName").textContent =
+              nextPrayer.name;
 
-statsObserver.observe(statsSection);
+            // Calculate Countdown H:M:S
+            const rHours = Math.floor(minDiff / 60);
+            const rMins = minDiff % 60;
+            const rSecs = 59 - now.getSeconds(); // Simple visual countdown effect
 
-// 5. Testimonial Auto Slider
-const slides = document.querySelectorAll(".testimonial-slide");
-let currentSlide = 0;
+            // Adjust if seconds roll over minutes
+            let displayMins = rMins;
+            if (rSecs === 59) displayMins -= 1;
+            // (Note: This is a simplified visual countdown, precise logic needs Date diff)
 
-const nextSlide = () => {
-  slides[currentSlide].classList.remove("active");
-  currentSlide = (currentSlide + 1) % slides.length;
-  slides[currentSlide].classList.add("active");
-};
+            document.getElementById("countdownTimer").textContent =
+              `${String(rHours).padStart(2, "0")}:${String(rMins).padStart(2, "0")}:${String(rSecs).padStart(2, "0")}`;
 
-setInterval(nextSlide, 5000);
+            // Highlight the card
+            const activeCard = document.getElementById(nextPrayer.id);
+            if (activeCard) activeCard.classList.add("active-prayer");
+          }
+        }
 
-// 6. Accordion FAQ
-accordionHeaders.forEach((header) => {
-  header.addEventListener("click", () => {
-    const body = header.nextElementSibling;
-    const isActive = header.classList.contains("active");
+        setInterval(updateClockAndPrayer, 1000);
+        updateClockAndPrayer(); // Initial call
 
-    // Close all others
-    document.querySelectorAll(".accordion-header").forEach((h) => {
-      h.classList.remove("active");
-      h.nextElementSibling.style.maxHeight = null;
-    });
+        // --- 3. Scroll Reveal Animation ---
+        const revealElements = document.querySelectorAll(".reveal");
 
-    // Toggle clicked
-    if (!isActive) {
-      header.classList.add("active");
-      body.style.maxHeight = body.scrollHeight + "px";
-    }
-  });
-});
+        const revealOnScroll = () => {
+          const windowHeight = window.innerHeight;
+          const elementVisible = 150;
 
-// 7. Scroll Reveal Animation
-const revealElements = document.querySelectorAll(".reveal");
+          revealElements.forEach((reveal) => {
+            const elementTop = reveal.getBoundingClientRect().top;
+            if (elementTop < windowHeight - elementVisible) {
+              reveal.classList.add("active");
+            }
+          });
+        };
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("active");
-      }
-    });
-  },
-  { threshold: 0.1 },
-);
+        window.addEventListener("scroll", revealOnScroll);
+        // Trigger once on load
+        revealOnScroll();
 
-revealElements.forEach((el) => revealObserver.observe(el));
+        // --- 4. Back to Top Button ---
+        const backToTopBtn = document.getElementById("backToTop");
+
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 300) {
+            backToTopBtn.style.display = "block";
+          } else {
+            backToTopBtn.style.display = "none";
+          }
+        });
+
+        backToTopBtn.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        // --- 5. FAQ Accordion ---
+        const accHeaders = document.querySelectorAll(".accordion-header");
+
+        accHeaders.forEach((header) => {
+          header.addEventListener("click", () => {
+            const item = header.parentElement;
+            const isActive = item.classList.contains("active");
+
+            // Close all others
+            document
+              .querySelectorAll(".accordion-item")
+              .forEach((i) => i.classList.remove("active"));
+
+            // Toggle current
+            if (!isActive) {
+              item.classList.add("active");
+            }
+          });
+        });
+
+        // --- 6. Simple Form Feedback (Mockup) ---
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function (e) {
+          // Note: In a real scenario, Formspree handles the submission.
+          // This is just a local UI feedback if submission is successful or prevented.
+          const btn = form.querySelector("button");
+          const originalText = btn.textContent;
+
+          btn.textContent = "Sending...";
+          btn.disabled = true;
+
+          setTimeout(() => {
+            // This mimics a successful interaction for the UI demo
+            btn.textContent = "Message Sent!";
+            btn.style.backgroundColor = "#25D366"; // Success green
+            btn.style.color = "#fff";
+            form.reset();
+
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.disabled = false;
+              btn.style.backgroundColor = "";
+              btn.style.color = "";
+            }, 3000);
+          }, 1500);
+        });
+      });
+    
